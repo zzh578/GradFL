@@ -9,7 +9,7 @@ from torchvision import transforms
 import datasets
 
 
-def get_transform(dataset):
+def get_transform(dataset, model_name):
     transform = None
     if dataset == 'emnist':
         transform = transforms.Compose(
@@ -17,12 +17,14 @@ def get_transform(dataset):
     elif dataset == 'cifar10':
         transform = transforms.Compose(
             [transforms.RandomCrop(32, padding=4),
+             transforms.Resize(224) if model_name == 'vgg16' else None,
              transforms.RandomHorizontalFlip(),
              transforms.ToTensor(),
              transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     elif dataset == 'cifar100':
         transform = transforms.Compose(
             [transforms.RandomCrop(32, padding=4),
+             transforms.Resize(224) if model_name == 'vgg16' else None,
              transforms.RandomHorizontalFlip(),
              transforms.ToTensor(),
              transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])

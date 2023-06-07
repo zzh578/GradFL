@@ -12,6 +12,7 @@ from config import cfg
 from globals import get_base_params
 from models.conv import conv, get_model_params
 from models.resnet import resnet18, get_model_params
+from models.vgg import vgg16
 
 
 # train_classify begin
@@ -44,6 +45,11 @@ def get_model(model_name, dataset, mode_rate):
         shape = dataset['train'][0]['img'].shape
         num_class = len(dataset['train'].classes)
         model = conv(shape, hidden_size, num_class, model_rate=mode_rate)
+    elif model_name == 'vgg16':
+        # hidden_size = [l1, l2, l3, l4, l5, fc_hidden]
+        hidden_size = [32, 32, 64, 64, 128, 512]
+        num_classes = len(dataset['train'].classes)
+        model = vgg16(hidden_size, num_classes, model_rate=mode_rate)
     else:
         raise ValueError('Dont have this Model: {}'.format(model_name))
     return model
@@ -200,7 +206,7 @@ def get_model_gradient(model, inference_data, label_mask, device):
         gradients[layer_name] = torch.abs(grad_out[0].cpu())
 
     for name, module in model.named_modules():
-        if 'conv' in name:
+        if 'conv' in name or 'linear' in name:
             handles.append(module.register_full_backward_hook(
                 lambda module, grad_in, grad_out, layer_name=name: save_gradient(module, grad_in, grad_out, layer_name)))
 

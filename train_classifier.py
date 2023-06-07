@@ -30,7 +30,7 @@ def main():
         print("Wandb is inited!")
 
     # global_dataset and non-iid progress
-    transform = get_transform(cfg['dataset'])
+    transform = get_transform(cfg['dataset'], cfg['model_name'])
     dataset = get_dataset(cfg['dataset'], transform)
     print('Dataset {} is OK!'.format(cfg['dataset']))
     data_train_split, label_train_split = non_iid(dataset['train'], cfg['numbers'], cfg['shardperuser'])
