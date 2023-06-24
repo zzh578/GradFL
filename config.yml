@@ -1,7 +1,7 @@
 #config
 #commucation
 use_email: False
-seed: 100000
+seed: 2023
 device: 0
 model_name: resnet18
 
@@ -22,6 +22,9 @@ use_wandb: False
 project_name: GradFL
 group_name: compare_LR
 
+# pre-train
+is_pre_train: True
+pre_train_epoch: 20
 
 #train
 inferen_batch: 128

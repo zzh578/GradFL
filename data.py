@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import numpy as np
 import torch
 from torch.utils.data import Dataset
@@ -37,6 +38,12 @@ def get_transform(dataset, model_name):
 
 def get_dataset(dataset_name, transform):
     path = os.path.join(sys.path[0], 'data', dataset_name)
+    processed = os.path.join(path, 'processed')
+    if os.path.exists(processed):
+        shutil.rmtree(processed)
+        print('Deleted last processed!')
+    else:
+        print('Dataset is clear!')
     dataset = {}
     if dataset_name == 'emnist':
         dataset['train'] = datasets.MNIST(path, 'train', 'label', transform=transform)
