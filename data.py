@@ -18,14 +18,14 @@ def get_transform(dataset, model_name):
     elif dataset == 'cifar10':
         transform = transforms.Compose(
             [transforms.RandomCrop(32, padding=4),
-             transforms.Resize(224) if model_name == 'vgg16' else None,
+             transforms.Resize(224) if model_name == 'vgg16' else transforms.RandomHorizontalFlip(p=0),
              transforms.RandomHorizontalFlip(),
              transforms.ToTensor(),
              transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     elif dataset == 'cifar100':
         transform = transforms.Compose(
             [transforms.RandomCrop(32, padding=4),
-             transforms.Resize(224) if model_name == 'vgg16' else None,
+             transforms.Resize(224) if model_name == 'vgg16' else transforms.RandomHorizontalFlip(p=0),
              transforms.RandomHorizontalFlip(),
              transforms.ToTensor(),
              transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
@@ -155,7 +155,7 @@ class SplitDataset(Dataset):
 
 
 # dataloader API
-def make_dataloader(dataset, batch_size=16):
-    return torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
+def make_dataloader(dataset, batch_size=16, shuffle=True):
+    return torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle, drop_last=True)
 
 

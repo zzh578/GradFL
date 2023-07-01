@@ -71,7 +71,7 @@ class Block(nn.Module):
         third_channels = torch.roll(torch.arange(self.conv2.weight.shape[0]), shifts=roll % self.conv2.weight.shape[0],
                                     dims=-1)[: int(rate * self.conv2.weight.shape[0])]
         self.idx[param_name + '.conv2.weight'] = (third_channels, second_channels)
-        self.idx[param_name + '.n1.weight'], self.idx[param_name + '.n1.bias'] = third_channels, third_channels
+        self.idx[param_name + '.n2.weight'], self.idx[param_name + '.n2.bias'] = third_channels, third_channels
         self.idx[param_name + '.shortcut.weight'] = (third_channels, first_channels)
 
         return third_channels
@@ -83,7 +83,7 @@ class Block(nn.Module):
 
         third_channels = torch.randperm(self.conv2.weight.shape[0])[: int(rate * self.conv2.weight.shape[0])]
         self.idx[param_name + '.conv2.weight'] = (third_channels, second_channels)
-        self.idx[param_name + '.n1.weight'], self.idx[param_name + '.n1.bias'] = third_channels, third_channels
+        self.idx[param_name + '.n2.weight'], self.idx[param_name + '.n2.bias'] = third_channels, third_channels
         self.idx[param_name + '.shortcut.weight'] = (third_channels, first_channels)
 
         return third_channels
@@ -95,7 +95,7 @@ class Block(nn.Module):
 
         third_channels = torch.arange(int(rate * self.conv2.weight.shape[0]))
         self.idx[param_name + '.conv2.weight'] = (third_channels, second_channels)
-        self.idx[param_name + '.n1.weight'], self.idx[param_name + '.n1.bias'] = third_channels, third_channels
+        self.idx[param_name + '.n2.weight'], self.idx[param_name + '.n2.bias'] = third_channels, third_channels
         self.idx[param_name + '.shortcut.weight'] = (third_channels, first_channels)
 
         return third_channels

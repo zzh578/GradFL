@@ -217,6 +217,7 @@ def get_grad_client_dataset_label(user_id, cfg, class_list, last_client_info, da
         model.load_state_dict(model_params)
         model = model.to(device)
         user_class_acc = []
+        '''
         for i in range(len(class_list)):
             i_label_list = class_list[i][:public_per_class_num]
             i_dataset = SplitDataset(dataset['train'], i_label_list)
@@ -228,6 +229,20 @@ def get_grad_client_dataset_label(user_id, cfg, class_list, last_client_info, da
                     output = model(img)
                     _, predicted = torch.max(output, dim=1)
                     correct_num += (predicted == target).sum().item()
+                user_class_acc.append(correct_num)
+        '''
+        label_list = []
+        for i in range(len(class_list)):
+            label_list.extend(class_list[i][:public_per_class_num])
+        i_dataset = SplitDataset(dataset['train'], label_list)
+        i_dataloader = make_dataloader(i_dataset, public_per_class_num, shuffle=False)
+        with torch.no_grad():
+            for batch in i_dataloader:
+                correct_num = 0
+                img, target = batch['img'].to(device), batch['label'].to(device)
+                output = model(img)
+                _, predicted = torch.max(output, dim=1)
+                correct_num += (predicted == target).sum().item()
                 user_class_acc.append(correct_num)
         user_idx_label = [i for i, _ in
                           sorted(enumerate(user_class_acc), key=lambda x: x[1], reverse=True)[: shardperuser]]
