@@ -19,6 +19,7 @@ def get_base_params():
     parser.add_argument('--select_model', type=str)
     parser.add_argument('--model_name', type=str)
     parser.add_argument('--group_name', type=str)
+    parser.add_argument('--client_send_label', action='store_true', default=False)
     args = vars(parser.parse_args())
     if args['probs']:
         probs = re.findall(pattern, args['probs'])

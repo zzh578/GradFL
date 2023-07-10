@@ -19,9 +19,9 @@ from models.vgg import vgg16
 def set_control(cfg):
     args = get_base_params()
     for k, v in args.items():
-        if v:
+        if v is not None:
             cfg[k] = v
-
+        # cfg[k] = v
 
 def set_seed(seed):
     torch.manual_seed(seed)  # 设置cpu随机种子， 方便复现

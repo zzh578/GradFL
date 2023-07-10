@@ -253,9 +253,9 @@ def get_grad_client_dataset_label(user_id, cfg, class_list, last_client_info, da
 
 
 def get_client_dataset_label(user_id, cfg, class_list, last_client_info, dataset, label_train_split, device):
-    if cfg['mode'] == 'awareGrad':
+    if cfg['mode'] == 'awareGrad' and (not cfg['client_send_label']):
         return get_grad_client_dataset_label(user_id, cfg, class_list, last_client_info, dataset, device)
-    elif cfg['mode'] == 'aware':
+    elif cfg['mode'] == 'aware' or cfg['client_send_label']:
         return label_train_split[user_id]
     else:
         return []
