@@ -74,7 +74,7 @@ def get_inferen_data(mode, inferen_batch, class_list, inferen_label, client_data
         for i in inferen_label:
             inferen_list.extend(class_list[i][:inferen_batch // len(inferen_label)])
         inferen_dataset = SplitDataset(global_dataset, inferen_list)
-        dataloader = make_dataloader(inferen_dataset, inferen_batch)
+        dataloader = make_dataloader(inferen_dataset, len(inferen_list))
     elif mode == 'aware':
         if inferen_batch == -1:
             inferen_batch = len(client_dataset)
