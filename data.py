@@ -78,7 +78,7 @@ def get_inferen_data(mode, inferen_batch, class_list, inferen_label, client_data
     elif mode == 'aware':
         if inferen_batch == -1:
             inferen_batch = len(client_dataset)
-        dataloader = make_dataloader(client_dataset, inferen_batch)
+        dataloader = make_dataloader(client_dataset, inferen_batch if inferen_batch <= len(client_dataset) else len(client_dataset))
     else:
         return inferen_data
     iterator = iter(dataloader)
