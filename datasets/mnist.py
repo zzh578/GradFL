@@ -46,10 +46,10 @@ class MNIST(Dataset):
         return
 
     def make_data(self):
-        train_img = read_image_file(os.path.join(self.path, 'train-images.idx3-ubyte'))
-        test_img = read_image_file(os.path.join(self.path, 't10k-images.idx3-ubyte'))
-        train_label = read_label_file(os.path.join(self.path, 'train-labels.idx1-ubyte'))
-        test_label = read_label_file(os.path.join(self.path, 't10k-labels.idx1-ubyte'))
+        train_img = read_image_file(os.path.join(self.path, 'train-images-idx3-ubyte'))
+        test_img = read_image_file(os.path.join(self.path, 't10k-images-idx3-ubyte'))
+        train_label = read_label_file(os.path.join(self.path, 'train-labels-idx1-ubyte'))
+        test_label = read_label_file(os.path.join(self.path, 't10k-labels-idx1-ubyte'))
         train_target, test_target = {'label': train_label}, {'label': test_label}
         classes = {}
         for i in range(10):
