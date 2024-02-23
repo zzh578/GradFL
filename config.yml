@@ -18,7 +18,7 @@ milestones:
 gamma: 0.1
 
 #wandb
-use_wandb: False
+use_wandb: True
 project_name: GradFL
 group_name: compare_LR
 
