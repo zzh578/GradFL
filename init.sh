@@ -68,3 +68,4 @@ else
   mkdir "./tinyimagenet"
   export HF_ENDPOINT=https://hf-mirror.com
   huggingface-cli download --repo-type dataset --resume-download zh-plus/tiny-imagenet --local-dir ./tinyimagenet --local-dir-use-symlinks False
+fi
