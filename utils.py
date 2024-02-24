@@ -40,6 +40,12 @@ def get_model(model_name, dataset, mode_rate):
         shape = dataset['train'][0]['img'].shape
         num_class = len(dataset['train'].classes)
         model = resnet18(shape, hidden_size, num_blocks=num_blocks, num_classes=num_class, model_rate=mode_rate)
+    elif model_name == 'resnet34':
+        hidden_size = [64, 128, 256, 512]
+        num_blocks = [3, 4, 6, 3]
+        shape = dataset['train'][0]['img'].shape
+        num_class = len(dataset['train'].classes)
+        model = resnet18(shape, hidden_size, num_blocks=num_blocks, num_classes=num_class, model_rate=mode_rate)
     elif model_name == 'conv':
         hidden_size = [64, 128, 256, 512]
         shape = dataset['train'][0]['img'].shape

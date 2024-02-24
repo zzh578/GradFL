@@ -60,3 +60,11 @@ else
   tar -xvf cifar-100-python.tar.gz
   mv cifar-100-python cifar100
 fi
+
+# Download tinyiamgenet
+if [[ -d "./tinyimagenet" ]]; then
+  echo tinyimagenet have exisited!
+else
+  mkdir "./tinyimagenet"
+  export HF_ENDPOINT=https://hf-mirror.com
+  huggingface-cli download --repo-type dataset --resume-download zh-plus/tiny-imagenet --local-dir ./tinyimagenet --local-dir-use-symlinks False

@@ -421,10 +421,12 @@ def resnet18(datashape, hidden_size, num_blocks, num_classes, track=False, model
     return model
 
 
+
+
 if __name__ == '__main__':
     rate = 0.5
     x = torch.rand((4, 3, 25, 25))
-    model = resnet18([3], [8, 8, 16, 16], [2, 2, 2, 2], 10, model_rate=1)
+    model = resnet18([3], [8, 8, 16, 16], [3, 4, 6, 3], 10, model_rate=1)
     print(model(x).shape)
     model_half = resnet18([3], [8, 8, 16, 16], [2, 2, 2, 2], 10, model_rate=rate)
     model.get_idx_aware(x, 0.5, 'absmax')

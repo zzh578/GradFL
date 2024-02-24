@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from torch.utils.data.dataloader import default_collate
 from torchvision import transforms
 
-import datasets
+import localdatasets
 
 
 def get_transform(dataset, model_name):
@@ -30,7 +30,12 @@ def get_transform(dataset, model_name):
              transforms.ToTensor(),
              transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     elif dataset == 'tinyimagenet':
-        transform = None    # Have finished in dataset
+        # transform = None    # Have finished in dataset
+        transform = transforms.Compose([
+        transforms.Resize(224) if model_name == 'vgg16' else transforms.RandomHorizontalFlip(p=0),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
     else:
         raise ValueError('Can\'t find {}'.format(dataset))
     return transform
@@ -46,17 +51,17 @@ def get_dataset(dataset_name, transform):
         print('Dataset is clear!')
     dataset = {}
     if dataset_name == 'emnist':
-        dataset['train'] = datasets.MNIST(path, 'train', 'label', transform=transform)
-        dataset['test'] = datasets.MNIST(path, 'test', 'label', transform=transform)
+        dataset['train'] = localdatasets.MNIST(path, 'train', 'label', transform=transform)
+        dataset['test'] = localdatasets.MNIST(path, 'test', 'label', transform=transform)
     elif dataset_name == 'cifar10':
-        dataset['train'] = datasets.CIFAR10(path, 'train', 'label', transform=transform)
-        dataset['test'] = datasets.CIFAR10(path, 'test', 'label', transform=transform)
+        dataset['train'] = localdatasets.CIFAR10(path, 'train', 'label', transform=transform)
+        dataset['test'] = localdatasets.CIFAR10(path, 'test', 'label', transform=transform)
     elif dataset_name == 'cifar100':
-        dataset['train'] = datasets.CIFAR100(path, 'train', 'label', transform=transform)
-        dataset['test'] = datasets.CIFAR100(path, 'test', 'label', transform=transform)
+        dataset['train'] = localdatasets.CIFAR100(path, 'train', 'label', transform=transform)
+        dataset['test'] = localdatasets.CIFAR100(path, 'test', 'label', transform=transform)
     elif dataset_name == 'tinyimgaenet':
-        dataset['train'] = datasets.TinyImagenet(path, 'train', 'label', transform=transform)
-        dataset['test'] = datasets.TinyImagenet(path, 'val', 'label', transform=transform)
+        dataset['train'] = localdatasets.TinyImagenet(path, 'train', 'label', transform=transform)
+        dataset['test'] = localdatasets.TinyImagenet(path, 'valid', 'label', transform=transform)
     else:
         raise ValueError('can\'t find {}'.format(dataset_name))
     return dataset
