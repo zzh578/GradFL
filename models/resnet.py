@@ -182,8 +182,10 @@ class ResNet(nn.Module):
         fun_name = 'layer'
         seq_index = ['1', '2', '3', '4']
         for s in seq_index:
-            for lay in ['0', '1']:
-                param_name = fun_name + s + '.' + lay
+            layer_loc = self.get_attar(fun_name+s)
+            # for lay in ['0', '1']:
+            for lay in range(len(layer_loc)):
+                param_name = fun_name + s + '.' + str(lay)
                 blc = self.get_attar(param_name)
                 second_channels = get_topk_index(gradient[param_name + '.conv1'], int(rate * blc.conv1.weight.shape[0]),
                                                  select_mode)

@@ -42,12 +42,15 @@ class TinyImagenet(Dataset):
         self.split = split
         self.subset = subset
         self.transform = transform
-        self.dataset = load_dataset(self.path)[self.split]
+        # print('Beging--------')
+        self.dataset = load_dataset(self.path, split=self.split, trust_remote_code=True)
         self.classes = [i for i in range(200)]
         self.classes_size = len(self.classes)
+        self.target = self.dataset['label']
 
     def __getitem__(self, index):
         img, target = self.dataset[index]['image'], self.dataset[index]['label']
+        img = img.convert('RGB')
         if self.transform:
             img = self.transform(img)
         return {'img': img, self.subset: target}
@@ -129,6 +132,8 @@ def read_dir(path, filename, c2n):
     '''
 
 if __name__ == '__main__':
-    path = 'D:\\ProgramCode\\vscodeCode\\eccvgrad\\tinyimagenet'
+    # path = 'D:\\ProgramCode\\vscodeCode\\eccvgrad\\tinyimagenet'
+    path = '/home/ubuntu/jyb/GradFL/data/tinyimagenet'
+    print(path)
     dataset = TinyImagenet(path, 'valid', 'label')
     print(len(dataset))

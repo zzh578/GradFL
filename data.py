@@ -59,7 +59,7 @@ def get_dataset(dataset_name, transform):
     elif dataset_name == 'cifar100':
         dataset['train'] = localdatasets.CIFAR100(path, 'train', 'label', transform=transform)
         dataset['test'] = localdatasets.CIFAR100(path, 'test', 'label', transform=transform)
-    elif dataset_name == 'tinyimgaenet':
+    elif dataset_name == 'tinyimagenet':
         dataset['train'] = localdatasets.TinyImagenet(path, 'train', 'label', transform=transform)
         dataset['test'] = localdatasets.TinyImagenet(path, 'valid', 'label', transform=transform)
     else:
