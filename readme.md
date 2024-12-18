@@ -10,11 +10,16 @@ python train_classifier.py --rounds 100 --lr 0.01 --mode awareGrad --model_name 
 #### roll
 python train_classifier.py --rounds 100 --lr 0.01 --mode roll --model_name resnet34 --dataset tinyimagenet --shardperuser 20 --group_name xxx --device 0
 
-###
-parameters mode
+### parameters mode
+awareGrad -> FedGSE
+
 aware -> FedDSE
+
 roll -> FedRolex
+
 rand -> Federated Dropout
+
 hetero -> HeteroFL
+
 fedavg -> FedAVG
 
