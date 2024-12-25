@@ -6,7 +6,7 @@ python train_classifier.py --rounds 100 --lr 0.01 --mode roll --model_name conv 
 
 ### resnet34 + tinyimagenet
 #### awareGrad
-python train_classifier.py --rounds 100 --lr 0.01 --mode awareGrad --model_name resnet34 --dataset tinyimagenet --shardperuser 20 --group_name xxx --client_send_label --device 0
+python train_classifier.py --rounds 100 --lr 0.01 --mode awareGrad --model_name resnet18 --dataset cifar10 --shardperuser 2 --group_name zzh --client_send_label --device 0
 #### roll
 python train_classifier.py --rounds 100 --lr 0.01 --mode roll --model_name resnet34 --dataset tinyimagenet --shardperuser 20 --group_name xxx --device 0
 

@@ -10,14 +10,15 @@ from collections import OrderedDict
 
 from config import cfg
 from utils import set_control, set_seed, get_model, make_scheduler, make_optimizer, generate_submodel_rate, \
-    generate_fix_submodel_rate_list
+    generate_fix_submodel_rate_list, Output_Record
 from utils import load_params_to_client_model
 from data import get_transform, get_dataset, SplitDataset, non_iid, make_dataloader, get_inferen_data, \
-    dataset_class_list
+    dataset_class_list, non_iid2, train_data_split
 
 
 def main():
     set_control(cfg)
+    out_record = Output_Record(cfg)
     set_seed(cfg['seed'])
     print('Config is OK!\n {}'.format(cfg))
     device = torch.device(cfg['device'])
@@ -33,9 +34,12 @@ def main():
 
     # global_dataset and non-iid progress
     transform = get_transform(cfg['dataset'], cfg['model_name'])
-    dataset = get_dataset(cfg['dataset'], transform)
+    dataset = get_dataset(cfg['dataset'], transform, cfg['dataset_dir'])
     print('Dataset {} is OK!'.format(cfg['dataset']))
-    data_train_split, label_train_split = non_iid(dataset['train'], cfg['numbers'], cfg['shardperuser'])
+    # data_train_split, label_train_split = non_iid(dataset['train'], cfg['numbers'], cfg['shardperuser'])
+    data_train_split, label_train_split = non_iid2(dataset['train'], cfg['numbers'], cfg['shardperuser'], cfg['dist_num'])
+    # print(data_train_split)
+    data_train_split, _ = train_data_split(data_train_split, cfg['train_frc'])
 
     # global_model
     global_model = get_model(cfg['model_name'], dataset, mode_rate=1)
@@ -62,11 +66,13 @@ def main():
     print('Experiment is beginning!')
     for i in range(cfg['rounds']):
         print(' ROUNDS {}'.format(i + 1), end=' ')
+        out_record.save_AUCs(['ROUNDS {}:\n'.format(i + 1)])
         num_activate_users = int(cfg['numbers'] * cfg['frc'])
         user_idxs = torch.randperm(cfg['numbers'])[:num_activate_users]
         clients_models_params = {}
         clients_models_shape = {}
         for user_idx in user_idxs:
+            out_record.save_msg(str(user_idx.item()) + ': ')
             # sub_dataset
             client_dataset = SplitDataset(dataset['train'], data_train_split[int(user_idx)])
             client_dataloader = make_dataloader(client_dataset, batch_size=cfg['batchsize'])
@@ -84,7 +90,7 @@ def main():
             inferen_data = get_inferen_data(cfg['mode'], cfg['inferen_batch'], class_list, user_idx_label,
                                             client_dataset, dataset['train'])
             load_params_to_client_model(global_model, client_model, inferen_data, cfg['mode'], device, rate,
-                                        cfg['select_mode'], label_mask, clients_models_shape, user_idx)
+                                        cfg['select_mode'], label_mask, clients_models_shape, user_idx, out_record)
             # train model
             run_train(client_model, client_dataloader, label_mask, device, optimizer, clients_models_params, user_idx)
             last_client_info[int(user_idx)].clear()
@@ -92,7 +98,9 @@ def main():
         combine_global_model_from_clients(global_model, user_idxs, clients_models_shape, clients_models_params)
         run_global_test(global_model, dataset, device)
         scheduler.step()
-    if cfg['user_wandb']:
+        out_record.save_msg('\n\n')
+        exit(0)
+    if cfg['use_wandb']:
         wandb.finish()
 
 

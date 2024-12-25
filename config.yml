@@ -51,5 +51,7 @@ select_mode: absmax
 
 # dataset
 dataset: emnist
-
-
+dataset_dir: dataset_raw
+dist_num: 20
+train_frc: 0.8
+test_data_path: ./output/test_data_idx

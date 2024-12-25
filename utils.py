@@ -23,6 +23,7 @@ def set_control(cfg):
             cfg[k] = v
         # cfg[k] = v
 
+
 def set_seed(seed):
     torch.manual_seed(seed)  # 设置cpu随机种子， 方便复现
     torch.cuda.manual_seed(seed)  # 设置GPU种子， 方便复现
@@ -122,7 +123,7 @@ def generate_submodel_rate(mode, sub_model_rate_list, user_idx):
 
 
 def load_params_to_client_model(global_model, client_model, inference_data, mode, device, rate, select_mode,
-                                label_mask, clients_models_shape, user_idx):
+                                label_mask, clients_models_shape, user_idx, our_record):
     if mode == 'aware':
         global_model.to(device)
         with torch.no_grad():
@@ -144,9 +145,29 @@ def load_params_to_client_model(global_model, client_model, inference_data, mode
         # global_model.get_idx_aware_grad(rate, correct_seq_gradients, select_mode)
         # client_model_idx = copy.deepcopy(global_model.idx)
         gradient = get_model_gradient(global_model, inference_data, label_mask, device)
+        # for key, val in global_model.named_parameters():
+        #     if 'conv' in key:
+        #         print(key)
+        #         print(val.shape)
+        # print()
+        # print()
+        # print()
+        # print()
+        # print()
+        # for key, val in gradient.items():
+        #     if 'conv' in key:
+        #         print(key)
+        #         # print(gradient[key])
+        #         print(gradient[key].shape)
+                # break
+
+        # exit(0)
         global_model.get_idx_aware_grad(rate, select_mode, gradient)
         # global_model.cpu()
         client_model_idx = copy.deepcopy(global_model.idx)
+
+
+
     elif mode == 'roll':
         global_model.get_idx_roll(rate)
         client_model_idx = copy.deepcopy(global_model.idx)
@@ -166,6 +187,21 @@ def load_params_to_client_model(global_model, client_model, inference_data, mode
         client_model_params = get_model_params(global_model, client_model_idx)
     except NameError as e:
         print(e)
+
+    module_idx = dict()
+
+    for key, val in global_model.idx.items():
+        if 'weight' in key:
+            if isinstance(val, tuple):
+                module_idx[key] = val[0].detach().numpy().tolist()
+            else:
+                module_idx[key] = val.detach().numpy().tolist()
+
+    our_record.save_msg(module_idx)
+    our_record.save_msg('\n')
+    # print(module_idx)
+    # exit(0)
+
     global_model.clear_idx()
     client_model.load_state_dict(client_model_params)
     clients_models_shape[int(user_idx)] = copy.deepcopy(client_model_idx)
@@ -209,6 +245,8 @@ def get_model_gradient(model, inference_data, label_mask, device):
             #     grad = self.reshape_transform(grad)
             gradients[layer_name] = grad.cpu().detach()
         '''
+        # print(grad_out[0].shape)
+        # exit(0)
         gradients[layer_name] = torch.abs(grad_out[0].cpu())
 
     for name, module in model.named_modules():
@@ -276,3 +314,36 @@ def load(path, mode='torch'):
     else:
         raise ValueError('Not valid save mode')
     return
+
+
+class Output_Record:
+    def __init__(self, args):
+        # 记录AUC
+        self.file_num = 0
+        self.dir_AUCs = "./output/module_idx/{}/".format(args['mode'])
+        self.AUCs = "Round\tAUC\tLoss\tTime"
+        self.file_name = "_".join((args['dataset'],
+                                "client_num_per_round=" + str(args['numbers'] * args['frc']),
+                                "comm_round=" + str(args['rounds']),))
+        '''
+        args.method, args.dataset_id,
+                              args.distribution,
+                              args.model_arch,
+                              args.model_mode,
+        '''
+        if not os.path.exists(self.dir_AUCs):
+            os.makedirs(self.dir_AUCs)
+        self.file_AUCs = self.dir_AUCs + self.file_name + '_' + str(self.file_num) + ".txt"
+        while os.path.exists(self.file_AUCs):
+            self.file_num = self.file_num + 1
+            self.file_AUCs = self.dir_AUCs + self.file_name + '_' + str(self.file_num) + ".txt"
+        # with open(self.file_AUCs, "w") as f:
+        #     f.write(self.AUCs + '\n')
+
+    def save_AUCs(self, AUCs):
+        with open(self.file_AUCs, 'a') as f:
+            f.write('\t'.join(map(str, AUCs)) + '\n')
+
+    def save_msg(self, msg):
+        with open(self.file_AUCs, 'a') as f:
+            f.write(str(msg))

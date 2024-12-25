@@ -160,6 +160,8 @@ class ResNet(nn.Module):
         start_channels = (torch.arange(self.datashape[0]))
         temp = self.conv(input)
         out = (F.relu(self.n1(self.scaler(self.conv(input)))), temp)
+        # print(out[0].shape)
+        # exit(0)
         first_channels = get_topk_index(out[0], int(rate * self.conv.weight.shape[0]), topmode)
         self.idx['conv.weight'], self.idx['conv.bias'] = (first_channels, start_channels), first_channels
         self.idx['n1.weight'], self.idx['n1.bias'] = first_channels, first_channels
@@ -177,6 +179,7 @@ class ResNet(nn.Module):
     def get_idx_aware_grad(self, rate, select_mode, gradient):
         start_channels = (torch.arange(self.datashape[0]))
         first_channels = get_topk_index(gradient['conv'], int(rate * self.conv.weight.shape[0]), select_mode)
+
         self.idx['conv.weight'], self.idx['conv.bias'] = (first_channels, start_channels), first_channels
         self.idx['n1.weight'], self.idx['n1.bias'] = first_channels, first_channels
         fun_name = 'layer'
@@ -382,6 +385,10 @@ def get_topk_index(x, k, topmode):
     if topmode == 'absmax':
         if x.dim() > 2:  # conv
             temp = torch.sum(x, dim=(0, 2, 3))
+            # print()
+            # print()
+            # print(torch.topk(temp, k))
+            # exit(0)
             return torch.topk(temp, k)[1]
         else:  # linear
             return torch.topk(x, k)[1]
@@ -421,8 +428,6 @@ def resnet18(datashape, hidden_size, num_blocks, num_classes, track=False, model
     model = ResNet(datashape, hidden_size, Block, num_blocks, num_classes, model_rate, track)
     model.apply(init_param)
     return model
-
-
 
 
 if __name__ == '__main__':
